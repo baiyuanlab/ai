@@ -183,6 +183,13 @@ if [ -z "$WP_ADMIN_PASS" ]; then
     INFO "$INFO_PASSWORD" "WP_ADMIN_PASS"
 fi
 
+# --- 自動生成隨機子網域 (如果設定為 auto 或留空) ---
+if [ "$SUB_DOMAIN" == "auto" ] || [ -z "$SUB_DOMAIN" ]; then
+    RANDOM_STR=$(generate_password 6 | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9')
+    SUB_DOMAIN="wp-${RANDOM_STR}"
+    INFO "🎭 已啟用隨機子網域模式: $SUB_DOMAIN"
+fi
+
 # --- Step 2: 獲取主機 IP ---
 INFO "$STEP_DNS" "DNS" "${SUB_DOMAIN}.${DOMAIN}" "(獲取IP中...)"
 
@@ -603,7 +610,7 @@ CONTAINER_IP=""
 IP_WAIT=0
 
 while [ $IP_WAIT -lt $TIMEOUT_IP ]; do
-    CONTAINER_IP=$(incus list "$CONTAINER_NAME" --format csv -c 4 2>/dev/null | grep -oP '\d+\.\d+\.\d+\.\d+' | head -1)
+    CONTAINER_IP=$(incus list "$CONTAINER_NAME" --format csv -c 4 2>/dev/null | grep -oP '\d+\.\d+\.\d+\.\d+' | head -1) || true
     
     if [ -n "$CONTAINER_IP" ]; then
         INFO "$STEP_IP_ASSIGNED" "$CONTAINER_IP"
