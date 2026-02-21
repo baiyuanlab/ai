@@ -56,7 +56,7 @@ log() {
 INFO() { log "INFO" "$1" "${@:2}"; }
 WARN() { log "WARN" "$1" "${@:2}"; }
 ERROR() { log "ERROR" "$1" "${@:2}"; }
-DEBUG() { [[ "${DEBUG:-false}" == "true" ]] && log "DEBUG" "$1" "${@:2}"; }
+DEBUG() { [[ "${DEBUG:-false}" == "true" ]] && log "DEBUG" "$1" "${@:2}" || true; }
 
 # 生成隨機密碼
 generate_password() {
